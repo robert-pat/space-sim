@@ -23,5 +23,6 @@ Space particle simulation
   - How to maintain update rate
 - Renderer
   - How to show color
+  - Make resizing the window work
   - Convert simulation into a frame to use
   - How to show simulation information

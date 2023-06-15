@@ -24,6 +24,7 @@ impl SimulationRenderer{
             *p = color;
         }
     }
+    // Only want to resize the thing displaying the simulation, the actual sim size should not change
     pub fn resize(&mut self, size: PhysicalSize<u32>){
         match self.current_frame.resize_surface(size.width, size.height){
             Ok(_) => {},
