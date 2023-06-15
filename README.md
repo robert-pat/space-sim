@@ -10,3 +10,11 @@ Space particle simulation
    1. Specify colors
    2. Specify positions
 3. Plan / Make structure for 2d physics
+
+-----
+### Status & TODOs:
+- Window
+  - Set up behavior for focusing / unfocusing the window
+  - implement resizing the window to scale up / down the simulation size
+  - Getting current mouse position to add / erase simulation particles
+  - 
