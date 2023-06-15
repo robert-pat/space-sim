@@ -12,8 +12,11 @@ impl SimulationContainer{
         todo!()
         // needs to handle empty string, ""
     }
+    pub fn step(&mut self){
+        //TODO: calc forces & move all particles to their next position
+        //TODO: add timing checks to ensure the sim updates independently from frame rate
+    }
 }
-
 impl Default for SimulationContainer{
     fn default() -> Self {
         SimulationContainer::new()

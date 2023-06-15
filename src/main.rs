@@ -58,6 +58,7 @@ fn main() {
                 else{
                     _renderer.color_count = 0;
                 }
+                // simulation.step(); TODO: add when ready
             }, // either render here
             Event::RedrawRequested(id) if id == window.id() => {}, // or render here
             Event::RedrawEventsCleared => {},

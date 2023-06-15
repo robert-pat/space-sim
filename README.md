@@ -17,4 +17,11 @@ Space particle simulation
   - Set up behavior for focusing / unfocusing the window
   - implement resizing the window to scale up / down the simulation size
   - Getting current mouse position to add / erase simulation particles
-  - 
+- Simulation
+  - Decide how to impl
+  - What info to have / show
+  - How to maintain update rate
+- Renderer
+  - How to show color
+  - Convert simulation into a frame to use
+  - How to show simulation information
