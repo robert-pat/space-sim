@@ -35,7 +35,7 @@ fn main() {
                 match event {
                     WindowEvent::CloseRequested => control_flow.set_exit(),
                     WindowEvent::Focused(_b) => {},
-                    WindowEvent::Resized(_size) => {},
+                    WindowEvent::Resized(_size) => _renderer.resize(_size),
                     WindowEvent::DroppedFile(path) => {
                         simulation.load_from_file(path.to_str().unwrap_or(""));
                     },

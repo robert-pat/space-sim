@@ -1,4 +1,5 @@
 use pixels::{Pixels, SurfaceTexture};
+use winit::dpi::PhysicalSize;
 use winit::window::Window;
 
 pub struct SimulationRenderer{
@@ -22,5 +23,11 @@ impl SimulationRenderer{
         for p in self.current_frame.frame_mut(){
             *p = color;
         }
+    }
+    pub fn resize(&mut self, size: PhysicalSize<u32>){
+        match self.current_frame.resize_surface(size.width, size.height){
+            Ok(_) => {},
+            Err(e) => {eprintln!("Resizing Failed! {:?}", e);}
+        };
     }
 }
