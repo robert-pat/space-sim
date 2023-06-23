@@ -21,3 +21,5 @@ TODOs:
     - Add an object
   - Decide how to control the simulation
     - How to trigger redraw when window size changes
+- Rendering
+  -  objects in top right appear are rendered "stuck" in the corner, unsure if they're actually there
