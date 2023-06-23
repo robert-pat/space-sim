@@ -16,5 +16,8 @@ Space particle simulation
 
 TODOs:
 - Simulation
-  - Add ability to step the simulation at the press of a key
-  - Create reliable way for the simulation to update at a certain frequency
+  - Decide on & impl perminate simulation controls
+    - Step the simulation
+    - Add an object
+  - Decide how to control the simulation
+    - How to trigger redraw when window size changes
