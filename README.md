@@ -21,6 +21,9 @@ Space particle simulation
 -----
 ### Status & TODOs:
 - Rendering
-  - Get things drawn to the screen in grayscale
-    - Functions to draw shapes on the canvas
-    - 
+  - Write function to set pixel color from x & y
+  - Write function to draw a shape w/ properties at an x, y
+    - Probably involve iterating through the whole frame for each shape
+    - Will mean draw order maters 
+  - Setup correct pixel canvas vs surface texture size (+ see difference)
+  - Get a small rendering text case working
