@@ -16,7 +16,7 @@ Space particle simulation
 
 TODOs:
 - Simulation
-  - Decide on & impl perminate simulation controls
+  - Decide on & impl permanent simulation controls
     - Step the simulation
     - Add an object
   - Decide how to control the simulation
