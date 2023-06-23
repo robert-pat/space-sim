@@ -7,6 +7,9 @@ use simulation::SimulationContainer;
 mod simulation;
 mod render;
 
+const DEFAULT_X: usize = 100;
+const DEFAULT_Y: usize = 100;
+
 fn main() {
     // window setup
     let event_loop = EventLoop::new();
@@ -23,7 +26,7 @@ fn main() {
     );
 
     // simulation setup
-    let mut simulation = SimulationContainer::new();
+    let mut simulation = SimulationContainer::new(DEFAULT_X, DEFAULT_Y);
 
     // build the closure to handle events in the loop & start it
     event_loop.run(

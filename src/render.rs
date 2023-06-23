@@ -1,6 +1,7 @@
 use pixels::{Pixels, SurfaceTexture};
 use winit::dpi::PhysicalSize;
 use winit::window::Window;
+use crate::simulation;
 
 pub struct SimulationRenderer{
     current_frame: Pixels,
@@ -30,5 +31,16 @@ impl SimulationRenderer{
             Ok(_) => {},
             Err(e) => {eprintln!("Resizing Failed! {:?}", e);}
         };
+    }
+    pub fn display_simulation(&mut self, sim: &simulation::SimulationContainer){
+        self.fill_color(0u8);
+        let frame = self.current_frame.frame_mut();
+        for s in &sim.space{
+            let coords = s.get_coordinates();
+            let position_in_frame =
+                coords.1.round() as usize /*x dimension of the window*/ + coords.0.round() as usize;
+            frame[position_in_frame] = 255u8;
+        }
+        self.render();
     }
 }
