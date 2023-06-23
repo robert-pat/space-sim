@@ -1,29 +1,20 @@
 # space-sim
 Space particle simulation
-
-### Steps:
-1. Create window
-   1. Open window
-   2. Allow resizing
-   3. Make window controls work
-2. Draw pixels to window
-   1. Specify colors
-   2. Specify positions
-3. Plan / Make structure for 2d physics
-
-
-----
-### Problems RN:
-- The rendering is weird
-  - sizing is not what i'd expect
-  - i can't get it to draw anything
-  - I think i'm lost in the ~~abstraction~~ sauce
 -----
 ### Status & TODOs:
 - Rendering
-  - Write function to set pixel color from x & y
-  - Write function to draw a shape w/ properties at an x, y
-    - Probably involve iterating through the whole frame for each shape
-    - Will mean draw order maters 
-  - Setup correct pixel canvas vs surface texture size (+ see difference)
-  - Get a small rendering text case working
+  - Simple shape rendering is done
+    - Circles & rectangles
+  - Simple pixel rendering is done
+    - Setting a specific pixel
+  - Can convert between pixel coordinates and buffer indices
+- Simulation
+  - Not going well
+  - Need the ability to test the simulation code, make sure it's working
+    - Rendering is mostly there
+    - Test case w/ two masses did nothing
+
+TODOs:
+- Simulation
+  - Add ability to step the simulation at the press of a key
+  - Create reliable way for the simulation to update at a certain frequency
