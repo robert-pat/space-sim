@@ -11,18 +11,16 @@ Space particle simulation
    2. Specify positions
 3. Plan / Make structure for 2d physics
 
+
+----
+### Problems RN:
+- The rendering is weird
+  - sizing is not what i'd expect
+  - i can't get it to draw anything
+  - I think i'm lost in the ~~abstraction~~ sauce
 -----
 ### Status & TODOs:
-- Window
-  - Set up behavior for focusing / unfocusing the window
-  - implement resizing the window to scale up / down the simulation size
-  - Getting current mouse position to add / erase simulation particles
-- Simulation
-  - Decide how to impl
-  - What info to have / show
-  - How to maintain update rate
-- Renderer
-  - How to show color
-  - Make resizing the window work
-  - Convert simulation into a frame to use
-  - How to show simulation information
+- Rendering
+  - Get things drawn to the screen in grayscale
+    - Functions to draw shapes on the canvas
+    - 
