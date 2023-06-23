@@ -1,5 +1,5 @@
 use pixels::SurfaceTexture;
-use winit::event::{Event, WindowEvent};
+use winit::event::{Event, VirtualKeyCode, WindowEvent};
 use winit::event_loop::EventLoop;
 use winit::window::WindowBuilder;
 use simulation::SimulationContainer;
@@ -45,13 +45,18 @@ fn main() {
                     WindowEvent::Focused(_b) => {},
                     WindowEvent::Resized(_size) => renderer.resize(_size),
                     WindowEvent::DroppedFile(_) => {},
-                    WindowEvent::KeyboardInput {input: _input,..} =>{},
-                    WindowEvent::MouseInput {..}=> {},
-                    WindowEvent::CursorMoved {position, ..} => {
-                        renderer.clear_frame([0u8; 4]);
-                        let pos = renderer.to_pixel(position);
-                        renderer.draw_sphere(pos.0, pos.1, 100, [255u8; 4]);
+                    WindowEvent::KeyboardInput {input: _input,..} =>{
+                        match _input.virtual_keycode.unwrap(){
+                            VirtualKeyCode::Period => { simulation.step(); },
+                            VirtualKeyCode::Comma => {
+                                renderer.clear_frame([0u8; 4]);
+                                draw_sim_to_frame(&mut renderer, &simulation);
+                            },
+                            _ => {},
+                        }
                     },
+                    WindowEvent::MouseInput {..}=> {},
+                    WindowEvent::CursorMoved {..} => {},
                     _ => {}
                 }
             },

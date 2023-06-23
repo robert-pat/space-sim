@@ -92,8 +92,8 @@ pub fn apply_gravity(elements: &mut [SimulationActor], first: usize, second: usi
     elements[first].x_vel += mag * theta.cos() * -dx.signum();
     elements[first].y_vel += mag * theta.sin() * -dy.signum();
 
-    elements[second].x_vel += (-mag) * theta.cos() * dx.signum();
-    elements[second].y_vel += (-mag) * theta.sin() * dy.signum();
+    elements[second].x_vel += mag * theta.cos() * dx.signum();
+    elements[second].y_vel += mag * theta.sin() * dy.signum();
 }
 pub fn move_actors(actors: &mut [SimulationActor]){
     for a in actors.iter_mut(){
