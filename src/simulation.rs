@@ -27,6 +27,7 @@ impl SimulationActor{
         }
     }
     pub fn coordinates(&self) -> (f64, f64){ (self.x_pos, self.y_pos) }
+    #[allow(unused)]
     pub fn change_color(&mut self, color: [u8; 4]){ self.color = color }
     pub fn get_color(&self) -> [u8; 4]{ self.color }
     pub fn radius(&self)-> u32 { self.radius }

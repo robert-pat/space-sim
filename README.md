@@ -1,25 +1,24 @@
 # space-sim
 Space particle simulation
 -----
-### Status & TODOs:
+### Usage & Documentation:
+- Simulation
+  - Finish the different number keys
+    - Key1 -> start simulating
+    - Key2 -> pause the simulation
+    - Key3 -> prune actors
 - Rendering
   - Simple shape rendering is done
-    - Circles & rectangles
-  - Simple pixel rendering is done
-    - Setting a specific pixel
-  - Can convert between pixel coordinates and buffer indices
+  - Set specific pixels from coordinates & convert to/from indices
+  - Pixel coloring (and maybe transparency)
+-----
+### TODOs:
+- Rendering
+  - Objects get stuck on the top & left border; conversion from (-) to u32 ?
+  - Better way to place shapes (spheres, rectangles) in key points of the window (center, etc.)
 - Simulation
-  - Not going well
-  - Need the ability to test the simulation code, make sure it's working
-    - Rendering is mostly there
-    - Test case w/ two masses did nothing
-
-TODOs:
-- Simulation
-  - Decide on & impl permanent simulation controls
+  - the gravity doesn't apply to all the objects equally / at the same time
+  - look at the ordering / combination figuring from the
+  - To add to keycodes:
     - Step the simulation
     - Add an object
-  - Decide how to control the simulation
-    - How to trigger redraw when window size changes
-- Rendering
-  -  objects in top right appear are rendered "stuck" in the corner, unsure if they're actually there

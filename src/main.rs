@@ -30,8 +30,8 @@ fn main() {
 
     // simulation setup
     let mut simulation = SimulationContainer::new();
-    simulation.add_actor(SimulationActor::new(200.0, 200.0, 100.0));
-    simulation.add_actor(SimulationActor::new(400.0, 400.0, 100.0));
+    simulation.add_actor(SimulationActor::new(200.0, 300.0, 100.0));
+    simulation.add_actor(SimulationActor::new(600.0, 300.0, 100.0));
 
     // build the closure to handle events in the loop & start it
     event_loop.run(
@@ -46,12 +46,15 @@ fn main() {
                     WindowEvent::Resized(_size) => renderer.resize(_size),
                     WindowEvent::DroppedFile(_) => {},
                     WindowEvent::KeyboardInput {input: _input,..} =>{
-                        match _input.virtual_keycode.unwrap(){
+                        match _input.virtual_keycode.unwrap_or(VirtualKeyCode::End){
                             VirtualKeyCode::Period => { simulation.step(); },
                             VirtualKeyCode::Comma => {
                                 renderer.clear_frame([0u8; 4]);
                                 draw_sim_to_frame(&mut renderer, &simulation);
                             },
+                            VirtualKeyCode::Key1 => simulation.resume(),
+                            VirtualKeyCode::Key2 => simulation.suspend(),
+                            VirtualKeyCode::Key3 => simulation.prune(),
                             _ => {},
                         }
                     },
@@ -64,7 +67,15 @@ fn main() {
             Event::UserEvent(_) => {},
             Event::Suspended => simulation.suspend(),
             Event::Resumed => simulation.resume(),
-            Event::MainEventsCleared => { renderer.render(); },
+            Event::MainEventsCleared => {
+                const SIM_STEP: std::time::Duration = std::time::Duration::from_millis(50);
+                renderer.clear_frame([0u8; 4]);
+                if simulation.is_running && simulation.prev_step.elapsed().unwrap() >= SIM_STEP {
+                    simulation.step();
+                }
+                draw_sim_to_frame(&mut renderer, &simulation);
+                renderer.render();
+            },
             Event::RedrawRequested(id) if id == window.id() => {},
             Event::RedrawEventsCleared => {},
             Event::LoopDestroyed => {},
