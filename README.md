@@ -14,7 +14,7 @@ Space particle simulation
 -----
 ### TODOs:
 - Rendering
-  - Objects get stuck on the top & left border; conversion from (-) to u32 ?
+  - fix the line drawing code
   - Better way to place shapes (spheres, rectangles) in key points of the window (center, etc.)
 - Simulation
   - the gravity doesn't apply to all the objects equally / at the same time
@@ -22,3 +22,5 @@ Space particle simulation
   - To add to keycodes:
     - Step the simulation
     - Add an object
+- Eventually
+  - the window takes a bit before anything gets drawn

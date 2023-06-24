@@ -38,6 +38,7 @@ impl Default for SimulationActor{
 
 pub struct SimulationContainer{
     pub(crate) is_running: bool,
+    pub(crate) render_me: bool,
     pub(crate) space: Vec<SimulationActor>,
     pub(crate) prev_step: std::time::SystemTime,
 }
@@ -45,6 +46,7 @@ impl SimulationContainer{
     pub fn new() -> Self{
         Self{
             is_running: false,
+            render_me: true,
             space: vec![],
             prev_step: std::time::SystemTime::now(),
         }

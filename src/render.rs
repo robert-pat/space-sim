@@ -2,7 +2,8 @@ use pixels::{Pixels, SurfaceTexture};
 use winit::dpi::{PhysicalPosition, PhysicalSize};
 use winit::window::Window;
 
-pub(crate) const DEFAULT_SIZE: PhysicalSize<u32> = PhysicalSize{width: 800, height: 600};
+pub(crate) const DEFAULT_WINDOW_SIZE: PhysicalSize<u32> = PhysicalSize{width: 800, height: 600};
+const DEFAULT_LINE_THICKNESS: f64 = 1f64 / 1000f64;
 
 pub struct FrameRenderer {
     current_frame: Pixels,
@@ -70,6 +71,21 @@ impl FrameRenderer {
             let pos = to_pixel_coordinates(i, &self.size);
             if pos.0  >= corner_x && pos.0 <= corner_x + width && pos.1 >= corner_y &&
                 pos.1 <= corner_y + height {
+                p.copy_from_slice(&color);
+            }
+        }
+    }
+    pub fn draw_line(&mut self, start_x: u32, start_y: u32, end_x: u32, end_y: u32, width: u8, color: [u8; 4]){
+        // TODO: this doesn't work at all
+        let m = (end_y as f64 - start_y as f64) / (end_x as f64 - start_x as f64);
+        let b = start_y as f64 - m * start_x as f64;
+        let w = DEFAULT_LINE_THICKNESS * width as f64;
+        for (i, p ) in
+        self.current_frame.frame_mut().chunks_exact_mut(4).enumerate(){
+            let pos = to_pixel_coordinates(i, &self.size);
+            // from y = mx + b -> mx + b - y = 0 for all points on the line
+            // line width controls how close to the "true" line (0 thickness)
+            if ((m * pos.0 as f64) + b - pos.1 as f64).abs() < w {
                 p.copy_from_slice(&color);
             }
         }
