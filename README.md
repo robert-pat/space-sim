@@ -14,7 +14,6 @@ Space particle simulation
 -----
 ### TODOs:
 - Rendering
-  - fix the line drawing code
   - Better way to place shapes (spheres, rectangles) in key points of the window (center, etc.)
 - Simulation
   - the gravity doesn't apply to all the objects equally / at the same time

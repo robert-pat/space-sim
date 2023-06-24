@@ -9,6 +9,8 @@ use crate::simulation::SimulationActor;
 mod simulation;
 mod render;
 
+const SIM_STEP: std::time::Duration = std::time::Duration::from_millis(50);
+
 fn main() {
     // window setup
     let event_loop = EventLoop::new();
@@ -16,6 +18,7 @@ fn main() {
         WindowBuilder::new()
             .with_inner_size(render::DEFAULT_WINDOW_SIZE)
             .with_title("Space Simulation")
+            .with_window_icon(None) //TODO: add an icon
             .build(&event_loop)
             .unwrap()
     };
@@ -74,14 +77,14 @@ fn main() {
             Event::MainEventsCleared => {
                 renderer.clear_frame([0u8; 4]);
                 if simulation.render_me{
-                    const SIM_STEP: std::time::Duration = std::time::Duration::from_millis(50);
                     if simulation.is_running && simulation.prev_step.elapsed().unwrap() >= SIM_STEP {
                         simulation.step();
                     }
                     draw_sim_to_frame(&mut renderer, &simulation);
                 }
-                renderer.draw_line(50, 50, 250, 250, 1, [255u8; 4]);
-                renderer.draw_line(100, 100, 100, 400, 2, [200u8; 4]);
+                renderer.draw_line(183, 291, 670, 415, [0, 128, 128, 255]);
+                renderer.draw_sphere(170, 170, 95, [200, 50, 90, 255]);
+                renderer.draw_rectangle(400, 400, 75, 150, [0, 255, 0, 255]);
                 renderer.render();
             },
             Event::RedrawRequested(id) if id == window.id() => {},
