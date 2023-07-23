@@ -1,25 +1,32 @@
 # space-sim
-Space particle simulation
+Test bed for rendering with Pixels.rs, a nice little rendering library that gives you a pixel buffer
+to get directly drawn on the screen. The end goals here are:
+  - Practice using Pixels & get some nice drawing functions
+  - Create a particle/physics sim (j with gravity for now, maybe more forces eventually)
+
+I'm mostly happy with the rendering capabilities, not that happy w/ the simulation part, and really need to
+work on the controls. 
 -----
 ### Usage & Documentation:
-- Simulation
-  - Finish the different number keys
-    - Key1 -> start simulating
-    - Key2 -> pause the simulation
-    - Key3 -> prune actors
+- Control the running program: (Key1 = "1" key in the num row)
+  - Key1 => Showcase mode
+  - Key2 => Simulation mode
+  - Key3 => step the simulation
+  - Key4 => play the simulation
+  - Key5 => pause the simulation
 - Rendering
-  - Simple shape rendering is done
-  - Set specific pixels from coordinates & convert to/from indices
-  - Pixel coloring (and maybe transparency)
+  - FrameRenderer
 -----
 ### TODOs:
 - Rendering
-  - Better way to place shapes (spheres, rectangles) in key points of the window (center, etc.)
+  - Test how robust the current draw functions are
+  - Look into text drawing
 - Simulation
-  - the gravity doesn't apply to all the objects equally / at the same time
-  - look at the ordering / combination figuring from the
-  - To add to keycodes:
-    - Step the simulation
-    - Add an object
-- Eventually
-  - the window takes a bit before anything gets drawn
+  - I don't think the gravity correctly applies to all the objects at the same time
+  - Muddle with the gravity strength & physical constants
+  - Test case with two bodies orbiting each other
+  - The simulation steps are relatively uneven & it looks like the objects jitter
+- Controls
+  - Toggleable overlay w/ text labeling what all the controls do
+  - Controls to place an additional object into the simulation while paused
+    - controllable size, mass, and (maybe) color

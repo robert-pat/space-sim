@@ -1,6 +1,6 @@
 const GRAVITATIONAL_CONSTANT: f64 = 1.0;
-const SIMULATION_TIMESTEP: f64 = 0.05;
-const SIMULATION_PRUNE_ZONE: f64 = 10000000f64; // 10 million
+const SIMULATION_TIME_STEP: f64 = 0.05;
+const SIMULATION_PRUNE_ZONE: f64 = 100000f64; // Hundred thousand
 const NEGLIGIBLE_RADIUS: u32 = 10;
 
 #[derive(Clone)]
@@ -38,7 +38,6 @@ impl Default for SimulationActor{
 
 pub struct SimulationContainer{
     pub(crate) is_running: bool,
-    pub(crate) render_me: bool,
     pub(crate) space: Vec<SimulationActor>,
     pub(crate) prev_step: std::time::SystemTime,
 }
@@ -46,7 +45,6 @@ impl SimulationContainer{
     pub fn new() -> Self{
         Self{
             is_running: false,
-            render_me: true,
             space: vec![],
             prev_step: std::time::SystemTime::now(),
         }
@@ -67,9 +65,9 @@ impl SimulationContainer{
     pub fn prune(&mut self){
         let mut v: Vec<usize> = Vec::new();
         for (i, actor) in self.space.iter().enumerate(){
-            if actor.x_pos >= SIMULATION_PRUNE_ZONE{ v.push(i); }
-            if actor.y_pos >= SIMULATION_PRUNE_ZONE{ v.push(i); }
-            if actor.radius <= NEGLIGIBLE_RADIUS{ v.push(i); }
+            if actor.x_pos >= SIMULATION_PRUNE_ZONE ||
+                actor.y_pos >= SIMULATION_PRUNE_ZONE ||
+                actor.radius <= NEGLIGIBLE_RADIUS { v.push(i); }
         }
         for index in v.into_iter().rev(){
             self.space.remove(index);
@@ -77,9 +75,7 @@ impl SimulationContainer{
     }
 }
 impl Default for SimulationContainer{
-    fn default() -> Self {
-        SimulationContainer::new()
-    }
+    fn default() -> Self { SimulationContainer::new() }
 }
 
 pub fn apply_gravity(elements: &mut [SimulationActor], first: usize, second: usize){
@@ -100,7 +96,7 @@ pub fn apply_gravity(elements: &mut [SimulationActor], first: usize, second: usi
 }
 pub fn move_actors(actors: &mut [SimulationActor]){
     for a in actors.iter_mut(){
-        a.x_pos += a.x_vel * SIMULATION_TIMESTEP;
-        a.y_pos += a.y_vel * SIMULATION_TIMESTEP;
+        a.x_pos += a.x_vel * SIMULATION_TIME_STEP;
+        a.y_pos += a.y_vel * SIMULATION_TIME_STEP;
     }
 }

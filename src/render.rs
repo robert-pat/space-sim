@@ -9,6 +9,9 @@ pub struct FrameRenderer {
     current_frame: Pixels,
     size: PhysicalSize<u32>,
 }
+
+pub struct Point(pub u32, pub u32);
+
 #[allow(unused)]
 impl FrameRenderer {
     pub fn new(width: u32, height: u32, texture: SurfaceTexture<Window>) -> Self{
@@ -28,8 +31,8 @@ impl FrameRenderer {
             |p|{p.copy_from_slice(&color);}
         );
     }
-    pub fn set_pixel(&mut self, x: u32, y: u32, color: [u8; 4]){
-        let pos = (x + y * self.size.width) as usize;
+    pub fn set_pixel(&mut self, pos: Point, color: [u8; 4]){
+        let pos = (pos.0 + pos.1 * self.size.width) as usize;
         self.current_frame.frame_mut()
             .chunks_exact_mut(4).nth(pos)
             .unwrap().copy_from_slice(&color);
@@ -54,32 +57,32 @@ impl FrameRenderer {
     }
     pub fn num_pixels(&self) -> u64{ self.size.width as u64 * self.size.height as u64 }
     pub fn dimensions(&self) -> PhysicalSize<u32>{ self.size }
-    pub fn draw_sphere(&mut self, center_x: u32, center_y: u32, radius: u32, color: [u8; 4]){
+    pub fn draw_sphere(&mut self, center: Point, radius: u32, color: [u8; 4]){
         for (i, p) in
         self.current_frame.frame_mut().chunks_exact_mut(4).enumerate(){
             let pos = to_pixel_coordinates(i, &self.size);
-            let dx = pos.0 as f64 - center_x as f64; // cast both b/c u32 would underflow
-            let dy = pos.1 as f64 - center_y as f64;
+            let dx = pos.0 as f64 - center.0 as f64; // cast both b/c u32 would underflow
+            let dy = pos.1 as f64 - center.1 as f64;
             if (dx.powf(2f64) + dy.powf(2f64)).sqrt() <= radius as f64{
                 p.copy_from_slice(&color);
             }
         }
     }
-    pub fn draw_rectangle(&mut self, corner_x: u32, corner_y: u32, width: u32, height: u32, color: [u8; 4]){
+    pub fn draw_rectangle(&mut self, corner: Point, width: u32, height: u32, color: [u8; 4]){
         for (i, p) in
         self.current_frame.frame_mut().chunks_exact_mut(4).enumerate(){
             let pos = to_pixel_coordinates(i, &self.size);
-            if pos.0  >= corner_x && pos.0 <= corner_x + width && pos.1 >= corner_y &&
-                pos.1 <= corner_y + height {
+            if pos.0  >= corner.0 && pos.0 <= corner.0 + width && pos.1 >= corner.1 &&
+                pos.1 <= corner.1 + height {
                 p.copy_from_slice(&color);
             }
         }
     }
-    pub fn draw_line(&mut self, start_x: u32, start_y: u32, end_x: u32, end_y: u32, color: [u8; 4]){
-        let m = (end_y as f64 - start_y as f64) / (end_x as f64 - start_x as f64);
-        let b = m * start_x as f64 - start_y as f64;
-        let x_range = start_x..=end_x;
-        let y_range = start_y..=end_y;
+    pub fn draw_line(&mut self, start: Point, end: Point, color: [u8; 4]){
+        let m = (end.1 as f64 - start.1 as f64) / (end.0 as f64 - start.0 as f64);
+        let b = m * start.0 as f64 - start.1 as f64;
+        let x_range = start.0..=end.0;
+        let y_range = start.1..=end.1;
 
         for (i, p) in
         self.current_frame.frame_mut().chunks_exact_mut(4).enumerate(){
@@ -91,18 +94,50 @@ impl FrameRenderer {
             }
         }
     }
-    pub fn window_to_pixel(&self, pos: PhysicalPosition<f64>) -> (u32, u32){
+    pub fn window_to_pixel(&self, pos: PhysicalPosition<f64>) -> Point{
         match self.current_frame.window_pos_to_pixel(pos.into()){
-            Ok(t) => (t.0 as u32, t.1 as u32),
-            Err(_) => (0u32, 0u32),
+            Ok(t) => Point(t.0 as u32, t.1 as u32),
+            Err(_) => Point(0u32, 0u32),
         }
     }
 }
 #[allow(unused)]
-fn to_index(x: u32, y: u32, size: &PhysicalSize<u32>)-> usize{
-    (x + y * size.width) as usize
+fn to_index(p: Point, size: &PhysicalSize<u32>)-> usize{
+    (p.0 + p.1 * size.width) as usize
 }
 #[allow(unused)]
-fn to_pixel_coordinates(index: usize, size: &PhysicalSize<u32>) -> (u32, u32){
-    (index as u32 % size.width, index as u32 / size.width)
+fn to_pixel_coordinates(index: usize, size: &PhysicalSize<u32>) -> Point{
+    Point(index as u32 % size.width, index as u32 / size.width)
+}
+
+pub fn draw_sim_to_frame(renderer: &mut FrameRenderer, sim: &crate::simulation::SimulationContainer){
+    for actor in &sim.space{
+        let pos = {
+            let p = actor.coordinates();
+            if p.0 < 0.0 || p.1 < 0.0 { continue; }
+            Point(
+                if p.0 >= u32::MAX as f64 { continue; } else { p.0.round() as u32 },
+                if p.1 >= u32::MAX as f64 { continue; } else { p.1.round() as u32 }
+            )
+        };
+        renderer.draw_sphere(pos, actor.radius(), actor.get_color());
+    }
+}
+
+pub fn showcase_shapes(r: &mut FrameRenderer){
+    r.draw_line(
+        Point(183, 291),
+        Point(670, 415),
+        [0, 128, 128, 255]
+    );
+    r.draw_sphere(
+        Point(170, 170),
+        95,
+        [200, 50, 90, 255]
+    );
+    r.draw_rectangle(
+        Point(400, 400),
+        75, 150,
+        [0, 255, 0, 255]
+    );
 }

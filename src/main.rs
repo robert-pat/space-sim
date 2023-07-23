@@ -11,8 +11,15 @@ mod render;
 
 const SIM_STEP: std::time::Duration = std::time::Duration::from_millis(50);
 
+enum DisplayMode{
+    Simulation,
+    Showcase
+}
+
+/*Probably need to create a struct to hold which things need to be rendered.
+* e.g. which DisplayMode, whether or not specific overlays need to be shown, etc. */
+
 fn main() {
-    // window setup
     let event_loop = EventLoop::new();
     let window = {
         WindowBuilder::new()
@@ -30,15 +37,17 @@ fn main() {
         window_size.height,
         SurfaceTexture::new(window_size.width, window_size.height, &window)
     );
+    let mut current_render_mode = DisplayMode::Showcase;
 
     // simulation setup
     let mut simulation = SimulationContainer::new();
     simulation.add_actor(SimulationActor::new(200.0, 300.0, 100.0));
     simulation.add_actor(SimulationActor::new(600.0, 300.0, 100.0));
-    simulation.render_me = false;
     simulation.suspend();
 
-    // build the closure to handle events in the loop & start it
+    // building the closure to handle control:
+    // user control -> Event::WindowEvent
+    // what to display -> Event::MainEventsCleared
     event_loop.run(
     move |event, _, control_flow| {
         control_flow.set_poll();
@@ -47,21 +56,15 @@ fn main() {
             Event::WindowEvent{window_id, event} if window_id == window.id() => {
                 match event {
                     WindowEvent::CloseRequested => control_flow.set_exit(),
-                    WindowEvent::Focused(_b) => {},
                     WindowEvent::Resized(_size) => renderer.resize(_size),
-                    WindowEvent::DroppedFile(_) => {},
                     WindowEvent::KeyboardInput {input: _input,..} =>{
+                        // Keyboard controls go here v
                         match _input.virtual_keycode.unwrap_or(VirtualKeyCode::End){
-                            VirtualKeyCode::Period => { simulation.step(); },
-                            VirtualKeyCode::Comma => {
-                                renderer.clear_frame([0u8; 4]);
-                                draw_sim_to_frame(&mut renderer, &simulation);
-                            },
-                            VirtualKeyCode::Key1 => simulation.resume(),
-                            VirtualKeyCode::Key2 => simulation.suspend(),
-                            VirtualKeyCode::Key3 => simulation.prune(),
-                            VirtualKeyCode::Key0 => simulation.render_me = false,
-                            VirtualKeyCode::Key9 => simulation.render_me = true,
+                            VirtualKeyCode::Key1 => current_render_mode = DisplayMode::Showcase,
+                            VirtualKeyCode::Key2 => current_render_mode = DisplayMode::Simulation,
+                            VirtualKeyCode::Key3 => simulation.step(),
+                            VirtualKeyCode::Key4 => simulation.resume(),
+                            VirtualKeyCode::Key5 => simulation.suspend(),
                             _ => {},
                         }
                     },
@@ -70,21 +73,17 @@ fn main() {
                     _ => {}
                 }
             },
-            Event::DeviceEvent { .. } => {},
-            Event::UserEvent(_) => {},
-            Event::Suspended => {},
-            Event::Resumed => {},
             Event::MainEventsCleared => {
                 renderer.clear_frame([0u8; 4]);
-                if simulation.render_me{
-                    if simulation.is_running && simulation.prev_step.elapsed().unwrap() >= SIM_STEP {
-                        simulation.step();
+                match current_render_mode{
+                    DisplayMode::Showcase => render::showcase_shapes(&mut renderer),
+                    DisplayMode::Simulation => {
+                        if simulation.is_running && simulation.prev_step.elapsed().unwrap() >= SIM_STEP {
+                            simulation.step();
+                        }
+                        render::draw_sim_to_frame(&mut renderer, &simulation);
                     }
-                    draw_sim_to_frame(&mut renderer, &simulation);
                 }
-                renderer.draw_line(183, 291, 670, 415, [0, 128, 128, 255]);
-                renderer.draw_sphere(170, 170, 95, [200, 50, 90, 255]);
-                renderer.draw_rectangle(400, 400, 75, 150, [0, 255, 0, 255]);
                 renderer.render();
             },
             Event::RedrawRequested(id) if id == window.id() => {},
@@ -94,18 +93,4 @@ fn main() {
         }
     }
     );
-}
-
-fn draw_sim_to_frame(renderer: &mut FrameRenderer, sim: &SimulationContainer){
-    for actor in &sim.space{
-        let pos = {
-            let p = actor.coordinates();
-            if p.0 < 0.0 || p.1 < 0.0 { continue; }
-            (
-                if p.0 >= u32::MAX as f64 { continue; } else { p.0.round() as u32 },
-                if p.1 >= u32::MAX as f64 { continue; } else { p.1.round() as u32 }
-            )
-        };
-        renderer.draw_sphere(pos.0, pos.1, actor.radius(), actor.get_color());
-    }
 }
