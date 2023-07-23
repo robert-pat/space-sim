@@ -41,8 +41,8 @@ fn main() {
 
     // simulation setup
     let mut simulation = SimulationContainer::new();
-    simulation.add_actor(SimulationActor::new(200.0, 300.0, 100.0));
-    simulation.add_actor(SimulationActor::new(600.0, 300.0, 100.0));
+    simulation.add_actor(SimulationActor::new(200.0, 300.0, 100.0, [255u8; 4]));
+    simulation.add_actor(SimulationActor::new(600.0, 300.0, 100.0, [128u8; 4]));
     simulation.suspend();
 
     // building the closure to handle control:

@@ -15,7 +15,7 @@ pub struct SimulationActor{
     color: [u8; 4]
 }
 impl SimulationActor{
-    pub fn new(x: f64, y: f64, mass: f64) -> Self {
+    pub fn new(x: f64, y: f64, mass: f64, color: [u8; 4]) -> Self {
         Self{
             x_pos: x,
             y_pos: y,
@@ -23,7 +23,7 @@ impl SimulationActor{
             y_vel: 0.0,
             mass,
             radius: 100,
-            color: [255u8; 4],
+            color,
         }
     }
     pub fn coordinates(&self) -> (f64, f64){ (self.x_pos, self.y_pos) }
@@ -33,7 +33,7 @@ impl SimulationActor{
     pub fn radius(&self)-> u32 { self.radius }
 }
 impl Default for SimulationActor{
-    fn default() -> Self { SimulationActor::new(0.0, 0.0, 1.0) }
+    fn default() -> Self { SimulationActor::new(0.0, 0.0, 1.0, [255u8; 4]) }
 }
 
 pub struct SimulationContainer{
