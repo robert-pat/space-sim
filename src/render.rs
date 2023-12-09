@@ -107,6 +107,7 @@ impl FrameRenderer {
         }
     }
     pub fn draw_line(&mut self, start: Point, end: Point, color: [u8; 4]) {
+        // TODO: consider modifying this to take a line weight (int multiple of LINE_TOLERANCE) ?
         let m = (end.1 as f64 - start.1 as f64) / (end.0 as f64 - start.0 as f64);
         let b = m * start.0 as f64 - start.1 as f64;
         let x_range = start.0..=end.0;
@@ -127,6 +128,10 @@ impl FrameRenderer {
                 p.copy_from_slice(&color);
             }
         }
+    }
+    pub fn draw_triangle(&mut self, vertex: (Point, Point, Point), color: [u8; 4]) {
+        // https://stackoverflow.com/questions/2049582/how-to-determine-if-a-point-is-in-a-2d-triangle
+        todo!("Impl triangle drawing, see StackOverflow answer in comment!")
     }
     pub fn window_to_pixel(&self, pos: PhysicalPosition<f64>) -> Point {
         match self.current_frame.window_pos_to_pixel(pos.into()) {
