@@ -11,7 +11,7 @@ pub struct SimulationActor {
     x_vel: f64,
     y_vel: f64,
     mass: f64,
-    radius: u32,
+    radius: u32, // u32 bc (rn) only used for rendering; maybe will or should change
     color: [u8; 4],
 }
 impl SimulationActor {
@@ -80,19 +80,13 @@ impl SimulationContainer {
     pub fn add_actor(&mut self, a: SimulationActor) {
         self.space.push(a);
     }
+    #[allow(unused)]
     pub fn prune(&mut self) {
-        let mut v: Vec<usize> = Vec::new();
-        for (i, actor) in self.space.iter().enumerate() {
-            if actor.x_pos >= SIMULATION_PRUNE_ZONE
+        self.space.retain(|actor| {
+            actor.x_pos >= SIMULATION_PRUNE_ZONE
                 || actor.y_pos >= SIMULATION_PRUNE_ZONE
                 || actor.radius <= NEGLIGIBLE_RADIUS
-            {
-                v.push(i);
-            }
-        }
-        for index in v.into_iter().rev() {
-            self.space.remove(index);
-        }
+        });
     }
 }
 impl Default for SimulationContainer {
