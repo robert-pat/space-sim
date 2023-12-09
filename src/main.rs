@@ -1,19 +1,19 @@
+use crate::render::FrameRenderer;
+use crate::simulation::SimulationActor;
 use pixels::SurfaceTexture;
+use simulation::SimulationContainer;
 use winit::event::{Event, VirtualKeyCode, WindowEvent};
 use winit::event_loop::EventLoop;
 use winit::window::WindowBuilder;
-use simulation::SimulationContainer;
-use crate::render::FrameRenderer;
-use crate::simulation::SimulationActor;
 
-mod simulation;
 mod render;
+mod simulation;
 
 const SIM_STEP: std::time::Duration = std::time::Duration::from_millis(50);
 
-enum DisplayMode{
+enum DisplayMode {
     Simulation,
-    Showcase
+    Showcase,
 }
 
 /*Probably need to create a struct to hold which things need to be rendered.
@@ -35,7 +35,7 @@ fn main() {
     let mut renderer = FrameRenderer::new(
         window_size.width,
         window_size.height,
-        SurfaceTexture::new(window_size.width, window_size.height, &window)
+        SurfaceTexture::new(window_size.width, window_size.height, &window),
     );
     let mut current_render_mode = DisplayMode::Showcase;
 
@@ -48,49 +48,49 @@ fn main() {
     // building the closure to handle control:
     // user control -> Event::WindowEvent
     // what to display -> Event::MainEventsCleared
-    event_loop.run(
-    move |event, _, control_flow| {
+    event_loop.run(move |event, _, control_flow| {
         control_flow.set_poll();
-        match event{
-            Event::NewEvents(_) => {},
-            Event::WindowEvent{window_id, event} if window_id == window.id() => {
+        match event {
+            Event::NewEvents(_) => {}
+            Event::WindowEvent { window_id, event } if window_id == window.id() => {
                 match event {
                     WindowEvent::CloseRequested => control_flow.set_exit(),
                     WindowEvent::Resized(_size) => renderer.resize(_size),
-                    WindowEvent::KeyboardInput {input: _input,..} =>{
+                    WindowEvent::KeyboardInput { input: _input, .. } => {
                         // Keyboard controls go here v
-                        match _input.virtual_keycode.unwrap_or(VirtualKeyCode::End){
+                        match _input.virtual_keycode.unwrap_or(VirtualKeyCode::End) {
                             VirtualKeyCode::Key1 => current_render_mode = DisplayMode::Showcase,
                             VirtualKeyCode::Key2 => current_render_mode = DisplayMode::Simulation,
                             VirtualKeyCode::Key3 => simulation.step(),
                             VirtualKeyCode::Key4 => simulation.resume(),
                             VirtualKeyCode::Key5 => simulation.suspend(),
-                            _ => {},
+                            _ => {}
                         }
-                    },
-                    WindowEvent::MouseInput {..}=> {},
-                    WindowEvent::CursorMoved {..} => {},
+                    }
+                    WindowEvent::MouseInput { .. } => {}
+                    WindowEvent::CursorMoved { .. } => {}
                     _ => {}
                 }
-            },
+            }
             Event::MainEventsCleared => {
                 renderer.clear_frame([0u8; 4]);
-                match current_render_mode{
+                match current_render_mode {
                     DisplayMode::Showcase => render::showcase_shapes(&mut renderer),
                     DisplayMode::Simulation => {
-                        if simulation.is_running && simulation.prev_step.elapsed().unwrap() >= SIM_STEP {
+                        if simulation.is_running
+                            && simulation.prev_step.elapsed().unwrap() >= SIM_STEP
+                        {
                             simulation.step();
                         }
                         render::draw_sim_to_frame(&mut renderer, &simulation);
                     }
                 }
                 renderer.render();
-            },
-            Event::RedrawRequested(id) if id == window.id() => {},
-            Event::RedrawEventsCleared => {},
-            Event::LoopDestroyed => {},
+            }
+            Event::RedrawRequested(id) if id == window.id() => {}
+            Event::RedrawEventsCleared => {}
+            Event::LoopDestroyed => {}
             _ => {}
         }
-    }
-    );
+    });
 }
