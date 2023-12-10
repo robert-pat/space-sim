@@ -11,8 +11,8 @@ pub struct FrameRenderer {
     current_frame: Pixels,
     size: PhysicalSize<u32>,
 }
-
-pub struct Point(pub u32, pub u32);
+#[derive(Copy, Clone, Debug)]
+pub struct PixelPoint(pub u32, pub u32);
 
 #[allow(unused)]
 impl FrameRenderer {
@@ -38,7 +38,7 @@ impl FrameRenderer {
                 p.copy_from_slice(&color);
             });
     }
-    pub fn set_pixel(&mut self, pos: Point, color: [u8; 4]) {
+    pub fn set_pixel(&mut self, pos: PixelPoint, color: [u8; 4]) {
         let pos = (pos.0 + pos.1 * self.size.width) as usize;
         self.current_frame
             .frame_mut()
@@ -74,7 +74,7 @@ impl FrameRenderer {
     pub fn dimensions(&self) -> PhysicalSize<u32> {
         self.size
     }
-    pub fn draw_sphere(&mut self, center: Point, radius: u32, color: [u8; 4]) {
+    pub fn draw_sphere(&mut self, center: PixelPoint, radius: u32, color: [u8; 4]) {
         for (i, p) in self
             .current_frame
             .frame_mut()
@@ -89,7 +89,7 @@ impl FrameRenderer {
             }
         }
     }
-    pub fn draw_rectangle(&mut self, corner: Point, width: u32, height: u32, color: [u8; 4]) {
+    pub fn draw_rectangle(&mut self, corner: PixelPoint, width: u32, height: u32, color: [u8; 4]) {
         for (i, p) in self
             .current_frame
             .frame_mut()
@@ -106,7 +106,7 @@ impl FrameRenderer {
             }
         }
     }
-    pub fn draw_line(&mut self, start: Point, end: Point, color: [u8; 4]) {
+    pub fn draw_line(&mut self, start: PixelPoint, end: PixelPoint, color: [u8; 4]) {
         // TODO: consider modifying this to take a line weight (int multiple of LINE_TOLERANCE) ?
         let m = (end.1 as f64 - start.1 as f64) / (end.0 as f64 - start.0 as f64);
         let b = m * start.0 as f64 - start.1 as f64;
@@ -129,26 +129,52 @@ impl FrameRenderer {
             }
         }
     }
-    pub fn draw_triangle(&mut self, vertex: (Point, Point, Point), color: [u8; 4]) {
-        // https://stackoverflow.com/questions/2049582/how-to-determine-if-a-point-is-in-a-2d-triangle
-        todo!("Impl triangle drawing, see StackOverflow answer in comment!")
+    // From: https://stackoverflow.com/questions/2049582/how-to-determine-if-a-point-is-in-a-2d-triangle
+    // Doesn't currently work with sucks + idk how to get it working :(
+    #[warn(deprecated)] // TODO: make pub(crate) once this starts working
+    fn draw_triangle(&mut self, vertex: (PixelPoint, PixelPoint, PixelPoint), color: [u8; 4]) {
+        fn sign_test_triangle(v1: PixelPoint, v2: PixelPoint, v3: PixelPoint) -> i32 {
+            let (v1_x, v1_y) = (v1.0 as i32, v1.1 as i32);
+            let (v2_x, v2_y) = (v2.0 as i32, v1.1 as i32);
+            let (v3_x, v3_y) = (v3.0 as i32, v3.1 as i32);
+            (v1_x - v3_x) * (v2_y - v3_y) - (v2_x - v3_x) * (v1_y - v3_y)
+        }
+        for (index, pixel) in self
+            .current_frame
+            .frame_mut()
+            .chunks_exact_mut(4)
+            .enumerate()
+        {
+            let point = to_pixel_coordinates(index, &self.size);
+            let (d1, d2, d3) = (
+                sign_test_triangle(point, vertex.0, vertex.1),
+                sign_test_triangle(point, vertex.1, vertex.2),
+                sign_test_triangle(point, vertex.2, vertex.1),
+            );
+
+            let h_neg = (d1 < 0) || (d2 < 0) || (d3 < 0);
+            let h_pos = (d1 > 0) || (d2 > 0) || (d3 > 0);
+
+            if !(h_neg && h_pos) {
+                pixel.copy_from_slice(&color);
+            }
+        }
     }
-    pub fn window_to_pixel(&self, pos: PhysicalPosition<f64>) -> Point {
+    pub fn window_to_pixel(&self, pos: PhysicalPosition<f64>) -> PixelPoint {
         match self.current_frame.window_pos_to_pixel(pos.into()) {
-            Ok(t) => Point(t.0 as u32, t.1 as u32),
-            Err(_) => Point(0u32, 0u32),
+            Ok(t) => PixelPoint(t.0 as u32, t.1 as u32),
+            Err(_) => PixelPoint(0u32, 0u32),
         }
     }
 }
 #[allow(unused)]
-fn to_index(p: Point, size: &PhysicalSize<u32>) -> usize {
+fn to_index(p: PixelPoint, size: &PhysicalSize<u32>) -> usize {
     (p.0 + p.1 * size.width) as usize
 }
 #[allow(unused)]
-fn to_pixel_coordinates(index: usize, size: &PhysicalSize<u32>) -> Point {
-    Point(index as u32 % size.width, index as u32 / size.width)
+fn to_pixel_coordinates(index: usize, size: &PhysicalSize<u32>) -> PixelPoint {
+    PixelPoint(index as u32 % size.width, index as u32 / size.width)
 }
-
 pub fn draw_sim_to_frame(
     renderer: &mut FrameRenderer,
     sim: &crate::simulation::SimulationContainer,
@@ -159,7 +185,7 @@ pub fn draw_sim_to_frame(
             if p.0 < 0.0 || p.1 < 0.0 {
                 continue;
             }
-            Point(
+            PixelPoint(
                 if p.0 >= u32::MAX as f64 {
                     continue;
                 } else {
@@ -177,7 +203,11 @@ pub fn draw_sim_to_frame(
 }
 
 pub fn showcase_shapes(r: &mut FrameRenderer) {
-    r.draw_line(Point(183, 291), Point(670, 415), [0, 128, 128, 255]);
-    r.draw_sphere(Point(170, 170), 95, [200, 50, 90, 255]);
-    r.draw_rectangle(Point(400, 400), 75, 150, [0, 255, 0, 255]);
+    r.draw_line(
+        PixelPoint(183, 291),
+        PixelPoint(670, 415),
+        [0, 128, 128, 255],
+    );
+    r.draw_sphere(PixelPoint(170, 170), 95, [200, 50, 90, 255]);
+    r.draw_rectangle(PixelPoint(400, 400), 75, 150, [0, 255, 0, 255]);
 }
